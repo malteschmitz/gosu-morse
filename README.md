@@ -6,19 +6,18 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 
 ## Installation
 
-* Install [Ruby](https://www.ruby-lang.org)
-  ```
-  brew install ruby
-  ```
-* Install the [SDL 2 library](http://www.libsdl.org/)
-  ```
-  brew install sdl2
-  ```
-* Install [Bundler](http://bundler.io/)
-  ```
-  gem install bundler
-  ```
-* Install required Ruby gems using bundler
-  ```
-  bundle install
-  ```
+1. Install [Ruby](https://www.ruby-lang.org)
+
+        brew install ruby
+ 
+1. Install the [SDL 2 library](http://www.libsdl.org/)
+
+        brew install sdl2
+  
+1. Install [Bundler](http://bundler.io/)
+
+        gem install bundler
+  
+1. Install required Ruby gems using bundler
+
+        bundle install
