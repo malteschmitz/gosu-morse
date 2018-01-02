@@ -1,5 +1,5 @@
 require 'gosu'
-require 'serialport'
+require 'rubyserial'
 
 class Morse < Gosu::Window
   SAMPLE_FREQUENCY = 440
@@ -90,7 +90,7 @@ SERIAL_BAUD = 115200
 
 Thread.abort_on_exception=true
 serialThread = Thread.new do
-  port = SerialPort.new(SERIAL_PORT, SERIAL_BAUD)
+  port = Serial.new(SERIAL_PORT, SERIAL_BAUD)
   loop do
     c = port.getbyte
     case c
@@ -99,6 +99,7 @@ serialThread = Thread.new do
     when LEFT_COMMAND + DOWN_COMMAND
       $morse.start_tone
     end
+    sleep 0.01
   end
 end
 

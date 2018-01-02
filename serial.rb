@@ -1,8 +1,9 @@
-require "serialport"
+require "rubyserial"
 
-port = SerialPort.new('/dev/cu.usbmodem1421', 115200)
+port = Serial.new('/dev/cu.usbmodem1421', 115200)
 
 loop do
-  c = port.getc
-  p c
+  c = port.getbyte
+  p c if c
+  sleep 0.01
 end
