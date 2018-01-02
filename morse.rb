@@ -8,6 +8,13 @@ class Morse < Gosu::Window
   # pixel movement per millisecond
   SPEED = 1
 
+  LEFT_COMMAND = 65
+  RIGHT_COMMAND = 70
+  DOWN_COMMAND = 0
+  UP_COMMAND = 1
+  SERIAL_PORT = '/dev/cu.usbmodem1421'
+  SERIAL_BAUD = 115200
+
   def initialize
     super WIDTH, HEIGHT
     self.caption = "Morse"
@@ -17,20 +24,19 @@ class Morse < Gosu::Window
     @history = []
     @history_dit = []
     @history_dah = []
-    @last_time = Gosu::milliseconds()
+    @last_time = 0
     @next_at = 0
     @stop_tone_at = 0
+    @now = 0
     @iambic = :mode_a # :mode_b
+
+    @port = Serial.new(SERIAL_PORT, SERIAL_BAUD)
 
     @cpm = 50
   end
 
-  def micros
-    Process.clock_gettime(Process::CLOCK_MONOTONIC, :nanosecond) / 1000.0
-  end
-
-  def dit_length # in us
-    6.0 / (@cpm) * 1000000
+  def dit_length # in ms
+    6.0 / (@cpm) * 1000
   end
 
   def dit_or_dash 
@@ -58,9 +64,29 @@ class Morse < Gosu::Window
     end
   end
 
+  def read_serial
+    c = @port.getbyte
+    case c
+    when LEFT_COMMAND + UP_COMMAND
+      dit_up
+    when LEFT_COMMAND + DOWN_COMMAND
+      dit_down
+    when RIGHT_COMMAND + UP_COMMAND
+      dah_up
+    when RIGHT_COMMAND + DOWN_COMMAND
+      dah_down
+    end
+  end
+
   def update
-    delta = Gosu::milliseconds() - @last_time
-    @last_time = Gosu::milliseconds()
+    @now = Gosu::milliseconds()
+    read_serial
+    
+    stop_tone if @now > @stop_tone_at
+    keyer_next if @now > @next_at
+    
+    delta = @now - @last_time
+    @last_time = @now
     move_history(@history, delta, @sending)
     move_history(@history_dit, delta, @dit_down)
     move_history(@history_dah, delta, @dah_down)
@@ -118,7 +144,7 @@ class Morse < Gosu::Window
 
   def play_dit
     start_tone
-    @stop_tone_at = micros + dit_length
+    @stop_tone_at = @now + dit_length
     @next_at = @stop_tone_at + dit_length
     @dit_pressed = false
     @last_was_dah = false
@@ -126,7 +152,7 @@ class Morse < Gosu::Window
 
   def play_dah
     start_tone
-    @stop_tone_at = micros + dah_length
+    @stop_tone_at = @now + dah_length
     @next_at = @stop_tone_at + dit_length
     @dah_pressed = false
     @last_was_dah = true
@@ -148,11 +174,6 @@ class Morse < Gosu::Window
     end
   end
 
-  def keyer_tick
-    stop_tone if micros > @stop_tone_at
-    keyer_next if micros > @next_at
-  end
-
   def start_tone
     unless @channel and @channel.playing?
       volume = 1
@@ -169,37 +190,8 @@ class Morse < Gosu::Window
       @channel.stop
     end
     @sending = false
+    @stop_tone_at = 0
   end
 end
 
-$morse = Morse.new
-
-LEFT_COMMAND = 65
-RIGHT_COMMAND = 70
-DOWN_COMMAND = 0
-UP_COMMAND = 1
-SERIAL_PORT = '/dev/cu.usbmodem1421'
-SERIAL_BAUD = 115200
-
-Thread.abort_on_exception=true
-serialThread = Thread.new do
-  port = Serial.new(SERIAL_PORT, SERIAL_BAUD)
-  loop do
-    c = port.getbyte
-    case c
-    when LEFT_COMMAND + UP_COMMAND
-      $morse.dit_up
-    when LEFT_COMMAND + DOWN_COMMAND
-      $morse.dit_down
-    when RIGHT_COMMAND + UP_COMMAND
-      $morse.dah_up
-    when RIGHT_COMMAND + DOWN_COMMAND
-      $morse.dah_down
-    end
-    $morse.keyer_tick
-    #sleep 0.01
-  end
-end
-
-$morse.show
-serialThread.exit
+Morse.new.show
