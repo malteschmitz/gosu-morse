@@ -78,6 +78,8 @@ class Morse < Gosu::Window
   end
 
   def update
+    self.caption = "Morse (#{Gosu.fps} FPS)"
+
     @now = Gosu::milliseconds()
     read_serial
     
