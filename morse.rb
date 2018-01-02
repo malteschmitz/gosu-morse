@@ -26,7 +26,6 @@ class Morse < Gosu::Window
     @history_dah = []
     @last_time = 0
     @next_at = 0
-    @stop_tone_at = 0
     @now = 0
     @iambic = :mode_a # :mode_b
 
@@ -68,13 +67,13 @@ class Morse < Gosu::Window
     c = @port.getbyte
     case c
     when LEFT_COMMAND + UP_COMMAND
-      dit_up
+      left_up
     when LEFT_COMMAND + DOWN_COMMAND
-      dit_down
+      left_down
     when RIGHT_COMMAND + UP_COMMAND
-      dah_up
+      right_up
     when RIGHT_COMMAND + DOWN_COMMAND
-      dah_down
+      right_down
     end
   end
 
@@ -82,7 +81,7 @@ class Morse < Gosu::Window
     @now = Gosu::milliseconds()
     read_serial
     
-    stop_tone if @now > @stop_tone_at
+    stop_tone if @stop_tone_at and @now > @stop_tone_at
     keyer_next if @now > @next_at
     
     delta = @now - @last_time
@@ -104,21 +103,31 @@ class Morse < Gosu::Window
     draw_history(@history_dah, 160, 10)
   end
 
-  # def button_down(id)
-  #   if id == Gosu::KB_SPACE
-  #     start_tone
-  #   else
-  #     super
-  #   end
-  # end
+  def button_down(id)
+    case id
+    when Gosu::KB_SPACE
+      start_tone
+    when Gosu::KB_LEFT
+      left_down
+    when Gosu::KB_RIGHT
+      right_down
+    else
+      super
+    end
+  end
 
-  # def button_up(id)
-  #   if id == Gosu::KB_SPACE
-  #     stop_tone
-  #   else
-  #     super
-  #   end
-  # end
+  def button_up(id)
+    case id
+    when Gosu::KB_SPACE
+      stop_tone
+    when Gosu::KB_LEFT
+      left_up
+    when Gosu::KB_RIGHT
+      right_up
+    else
+      super
+    end
+  end
   
   def dit_up
     @dit_down = false
@@ -141,6 +150,11 @@ class Morse < Gosu::Window
     @dah_pressed = true
     @history_dah << {width: 0, pos: 0}
   end
+
+  alias left_up dit_up
+  alias left_down dit_down
+  alias right_up dah_up
+  alias right_down dah_down
 
   def play_dit
     start_tone
@@ -190,7 +204,7 @@ class Morse < Gosu::Window
       @channel.stop
     end
     @sending = false
-    @stop_tone_at = 0
+    @stop_tone_at = nil
   end
 end
 
