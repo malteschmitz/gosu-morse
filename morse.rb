@@ -1,12 +1,11 @@
 require 'gosu'
 require 'rubyserial'
+require_relative 'menu'
 
 class Morse < Gosu::Window
   SAMPLE_FREQUENCY = 440
   WIDTH = 1600
   HEIGHT = 900
-  # pixel movement per millisecond
-  SPEED = 1
 
   LEFT_COMMAND = 65
   RIGHT_COMMAND = 70
@@ -18,22 +17,31 @@ class Morse < Gosu::Window
   DAH_COLOR = Gosu::Color.new(255, 255, 128, 128)
   DIT_COLOR = Gosu::Color.new(255, 255, 255, 128)
 
+  attr_accessor :cpm
+  attr_accessor :speed
+  attr_accessor :frequency
+  attr_accessor :iambic_mode_b
+  attr_reader :now
+
   def initialize
-    super WIDTH, HEIGHT
-    self.caption = "Morse"
+    super WIDTH, HEIGHT #, true
+    self.caption = "Morse Code Visualizer"
     @sample = Gosu::Sample.new("440.wav")
-    @frequency = 660
     @history = []
     @history_dit = []
     @history_dah = []
     @last_time = 0
     @next_at = 0
     @now = 0
-    @iambic = :mode_a # :mode_b
-
     @port = Serial.new(SERIAL_PORT, SERIAL_BAUD)
 
+    # configurable options
+    @frequency = 660
+    @speed = 1000 # pixel movement per second
+    @iambic_mode_b = false # false -> using mode B
     @cpm = 50
+    
+    @menu = Menu.new(self)    
   end
 
   def mix_colors(c1, c2, p)
@@ -63,7 +71,7 @@ class Morse < Gosu::Window
 
   def move_history(history, delta, down)
     history.map! do |block|
-      block[:pos] += SPEED * delta
+      block[:pos] += @speed * delta / 1000
       block
     end
     history.reject!{ |block| block[:pos] > WIDTH }
@@ -88,10 +96,9 @@ class Morse < Gosu::Window
   end
 
   def update
-    self.caption = "Morse (#{Gosu.fps} FPS)"
-
     @now = Gosu::milliseconds()
     read_serial
+    @menu.read_keyboard
     
     stop_tone if @stop_tone_at and @now > @stop_tone_at
     keyer_next if @now > @next_at
@@ -111,13 +118,14 @@ class Morse < Gosu::Window
 
   def draw
     draw_history(@history, 100, 30) do |block|
-      duration = block[:width] / SPEED
+      duration = block[:width] * 1000 / @speed
       duration = [[duration, dit_length].max, dah_length].min
       p = (duration - dit_length) / (dah_length - dit_length)
       mix_colors(DIT_COLOR, DAH_COLOR, p)
     end
     draw_history(@history_dit, 140, 4) { DIT_COLOR }
     draw_history(@history_dah, 150, 4) { DAH_COLOR }
+    @menu.draw
   end
 
   def button_down(id)
@@ -148,7 +156,7 @@ class Morse < Gosu::Window
   
   def dit_up
     @dit_down = false
-    @dit_pressed = false if @iambic == :mode_a
+    @dit_pressed = false unless @iambic_mode_b
   end
 
   def dit_down
@@ -159,7 +167,7 @@ class Morse < Gosu::Window
 
   def dah_up
     @dah_down = false
-    @dah_pressed = false if @iambic == :mode_a
+    @dah_pressed = false unless @iambic_mode_b
   end
 
   def dah_down
