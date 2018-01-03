@@ -21,3 +21,8 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 1. Install required Ruby gems using bundler
 
         bundle install
+
+## TODO
+
+* start if tty not available
+* swap left and right paddle (and key and tree)
