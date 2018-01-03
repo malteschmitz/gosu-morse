@@ -15,10 +15,12 @@ class Morse < Gosu::Window
   SERIAL_PORT = '/dev/cu.usbmodem1421'
   SERIAL_BAUD = 115200
 
+  DAH_COLOR = Gosu::Color.new(255, 255, 128, 128)
+  DIT_COLOR = Gosu::Color.new(255, 255, 255, 128)
+
   def initialize
     super WIDTH, HEIGHT
     self.caption = "Morse"
-    @color = Gosu::Color.new(255, 255, 255, 255)
     @sample = Gosu::Sample.new("440.wav")
     @frequency = 660
     @history = []
@@ -32,6 +34,14 @@ class Morse < Gosu::Window
     @port = Serial.new(SERIAL_PORT, SERIAL_BAUD)
 
     @cpm = 50
+  end
+
+  def mix_colors(c1, c2, p)
+    alpha = (1-p) * c1.alpha + p * c2.alpha
+    red = (1-p) * c1.red + p * c2.red
+    green = (1-p) * c1.green + p * c2.green
+    blue = (1-p) * c1.blue + p * c2.blue
+    Gosu::Color.new(alpha, red, green, blue)
   end
 
   def dit_length # in ms
@@ -95,14 +105,19 @@ class Morse < Gosu::Window
 
   def draw_history(history, y, height)
     history.each do |block|
-      Gosu.draw_rect(block[:pos], y, block[:width], height, @color)
+      Gosu.draw_rect(block[:pos], y, block[:width], height, yield(block))
     end
   end
 
   def draw
-    draw_history(@history, 100, 30)
-    draw_history(@history_dit, 140, 10)
-    draw_history(@history_dah, 160, 10)
+    draw_history(@history, 100, 30) do |block|
+      duration = block[:width] / SPEED
+      duration = [[duration, dit_length].max, dah_length].min
+      p = (duration - dit_length) / (dah_length - dit_length)
+      mix_colors(DIT_COLOR, DAH_COLOR, p)
+    end
+    draw_history(@history_dit, 140, 4) { DIT_COLOR }
+    draw_history(@history_dah, 150, 4) { DAH_COLOR }
   end
 
   def button_down(id)
