@@ -2,6 +2,7 @@ require 'gosu'
 require 'rubyserial'
 require_relative 'menu'
 require_relative 'tree'
+require_relative 'colors'
 
 class Morse < Gosu::Window
   SAMPLE_FREQUENCY = 440
@@ -14,9 +15,6 @@ class Morse < Gosu::Window
   UP_COMMAND = 1
   SERIAL_PORT = '/dev/cu.usbmodem1421'
   SERIAL_BAUD = 115200
-
-  DAH_COLOR = Gosu::Color.new(255, 255, 128, 128)
-  DIT_COLOR = Gosu::Color.new(255, 255, 255, 128)
 
   attr_accessor :cpm
   attr_accessor :speed
@@ -44,14 +42,6 @@ class Morse < Gosu::Window
     
     @menu = Menu.new(self)
     @tree = Tree.new(self)   
-  end
-
-  def mix_colors(c1, c2, p)
-    alpha = (1-p) * c1.alpha + p * c2.alpha
-    red = (1-p) * c1.red + p * c2.red
-    green = (1-p) * c1.green + p * c2.green
-    blue = (1-p) * c1.blue + p * c2.blue
-    Gosu::Color.new(alpha, red, green, blue)
   end
 
   def dit_length # in ms
@@ -123,10 +113,10 @@ class Morse < Gosu::Window
       duration = block[:width] * 1000 / @speed
       duration = [[duration, dit_length].max, dah_length].min
       p = (duration - dit_length) / (dah_length - dit_length)
-      mix_colors(DIT_COLOR, DAH_COLOR, p)
+      Colors::mix(Colors::DIT, Colors::DAH, p)
     end
-    draw_history(@history_dit, 140, 4) { DIT_COLOR }
-    draw_history(@history_dah, 150, 4) { DAH_COLOR }
+    draw_history(@history_dit, 140, 4) { Colors::DIT }
+    draw_history(@history_dah, 150, 4) { Colors::DAH }
     @menu.draw
     @tree.draw
   end
