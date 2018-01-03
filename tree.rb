@@ -49,21 +49,39 @@ class Tree
   def initialize(morse)
     @morse = morse
     build_tree
-    @tree[:active] = true
-    @tree[:dit][:active] = true
-    @tree[:dit][:dah][:active] = true
-    @tree[:dit][:dah][:dah][:active] = true
     @circle = Gosu::Image.new("circle.png", :tileable => true)
     @circle_active = Gosu::Image.new("circle_thick.png", :tileable => true)
     @font = Gosu::Font.new(26)
+    reset
+    ".--".each_char{ |x| go(x) }
   end
 
   def draw
-    #draw_node(300, 300, "A")
     draw_tree(@tree, 0, Morse::WIDTH / 2, Morse::HEIGHT / 2)
   end
 
+  def reset
+    disable_node(@tree)
+    @current_node = @tree
+    @current_node[:active] = true
+  end
+
+  def go(code)
+    if code == "."
+      @current_node = @current_node[:dit] if @current_node[:dit]
+    elsif code == "-"
+      @current_node = @current_node[:dah] if @current_node[:dah]
+    end
+    @current_node[:active] = true
+  end
+
   private
+
+  def disable_node(node)
+    node.delete(:active)
+    disable_node(node[:dah]) if node[:dah]
+    disable_node(node[:dit]) if node[:dit]
+  end
 
   def draw_node(x, y, text, active = false)
     color = Colors::NODE
