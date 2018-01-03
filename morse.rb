@@ -1,6 +1,7 @@
 require 'gosu'
 require 'rubyserial'
 require_relative 'menu'
+require_relative 'tree'
 
 class Morse < Gosu::Window
   SAMPLE_FREQUENCY = 440
@@ -41,7 +42,8 @@ class Morse < Gosu::Window
     @iambic_mode_b = false # false -> using mode B
     @cpm = 50
     
-    @menu = Menu.new(self)    
+    @menu = Menu.new(self)
+    @tree = Tree.new(self)   
   end
 
   def mix_colors(c1, c2, p)
@@ -126,6 +128,7 @@ class Morse < Gosu::Window
     draw_history(@history_dit, 140, 4) { DIT_COLOR }
     draw_history(@history_dah, 150, 4) { DAH_COLOR }
     @menu.draw
+    @tree.draw
   end
 
   def button_down(id)
