@@ -1,20 +1,13 @@
 require 'gosu'
-require 'rubyserial'
 require_relative 'menu'
 require_relative 'tree'
 require_relative 'colors'
+require_relative 'serial_interface'
 
 class Morse < Gosu::Window
   SAMPLE_FREQUENCY = 440
   WIDTH = 1600
   HEIGHT = 900
-
-  LEFT_COMMAND = 65
-  RIGHT_COMMAND = 70
-  DOWN_COMMAND = 0
-  UP_COMMAND = 1
-  SERIAL_PORT = '/dev/cu.usbmodem1421'
-  SERIAL_BAUD = 115200
 
   attr_accessor :cpm
   attr_accessor :speed
@@ -32,8 +25,7 @@ class Morse < Gosu::Window
     @last_time = 0
     @next_at = 0
     @now = 0
-    @port = Serial.new(SERIAL_PORT, SERIAL_BAUD)
-
+    
     # configurable options
     @frequency = 660
     @speed = 1000 # pixel movement per second
@@ -41,7 +33,8 @@ class Morse < Gosu::Window
     @cpm = 50
     
     @menu = Menu.new(self)
-    @tree = Tree.new(self)   
+    @tree = Tree.new(self)
+    @serial = SerialInterface.new(self)
   end
 
   def dit_length # in ms
@@ -73,23 +66,9 @@ class Morse < Gosu::Window
     end
   end
 
-  def read_serial
-    c = @port.getbyte
-    case c
-    when LEFT_COMMAND + UP_COMMAND
-      left_up
-    when LEFT_COMMAND + DOWN_COMMAND
-      left_down
-    when RIGHT_COMMAND + UP_COMMAND
-      right_up
-    when RIGHT_COMMAND + DOWN_COMMAND
-      right_down
-    end
-  end
-
   def update
     @now = Gosu::milliseconds()
-    read_serial
+    @serial.read
     @menu.read_keyboard
     
     stop_tone if @stop_tone_at and @now > @stop_tone_at

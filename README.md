@@ -24,7 +24,6 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 
 ## TODO
 
-* start if tty not available
 * decoding
 * typing of letters through the keyboard
 * automatic CpM detection
