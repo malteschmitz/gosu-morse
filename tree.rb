@@ -52,29 +52,48 @@ class Tree
     @circle_active = Gosu::Image.new("circle_thick.png", :tileable => true)
     @font = Gosu::Font.new(26)
     reset
-    ".--".each_char{ |x| go(x) }
   end
 
   def draw
     draw_tree(@tree, 0, Morse::WIDTH / 2, Morse::HEIGHT / 2)
   end
 
+  def symbol
+    if @current_node
+      @current_node[:symbol]
+    else
+      nil
+    end
+  end
+
   def reset
+    enable_tree
+  end
+
+  def go(code)
+    return unless @current_node
+    if code == "." and @current_node[:dit]
+      @current_node = @current_node[:dit]
+    elsif code == "-" and @current_node[:dah]
+      @current_node = @current_node[:dah]
+    else
+      disable_tree
+    end
+    @current_node[:active] = true if @current_node
+  end
+
+  private
+
+  def disable_tree
+    disable_node(@tree)
+    @current_node = nil
+  end
+
+  def enable_tree
     disable_node(@tree)
     @current_node = @tree
     @current_node[:active] = true
   end
-
-  def go(code)
-    if code == "."
-      @current_node = @current_node[:dit] if @current_node[:dit]
-    elsif code == "-"
-      @current_node = @current_node[:dah] if @current_node[:dah]
-    end
-    @current_node[:active] = true
-  end
-
-  private
 
   def disable_node(node)
     node.delete(:active)

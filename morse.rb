@@ -74,6 +74,8 @@ class Morse < Gosu::Window
     stop_tone if @stop_tone_at and @now > @stop_tone_at
     keyer_next if @now > @next_at
     
+    decode_pause(@now - @last_tone_event) if !@sending and @last_tone_event
+
     delta = @now - @last_time
     @last_time = @now
     move_history(@history, delta, @sending)
@@ -193,15 +195,49 @@ class Morse < Gosu::Window
       @channel = @sample.play(volume, speed, looping)
     end
     @sending = true
+    if @decoded
+      @decoded = nil
+      @tree.reset
+    end
+    @last_tone_event = @now
     @history << {width: 0, pos: 0}
   end
 
   def stop_tone
+    decode_tone(@now - @last_tone_event) if @last_tone_event
     if @channel and @channel.playing?
       @channel.stop
     end
     @sending = false
     @stop_tone_at = nil
+    @last_tone_event = @now
+  end
+
+  def decode_tone(pause)
+    if pause > dit_or_dash
+      @tree.go("-")
+    else
+      @tree.go(".")
+    end
+  end
+
+  def decode_pause(pause)
+    if pause > letter_break and !@decoded
+      symbol = @tree.symbol
+      symbol = "�" unless symbol
+      write symbol
+    end
+    if pause > 5 * word_break
+      write "\n" if @decoded != "\n"
+      @tree.reset
+    elsif pause > word_break
+      write " " if @decoded != " "
+    end
+  end
+
+  def write(char)
+    print char
+    @decoded = char
   end
 end
 
