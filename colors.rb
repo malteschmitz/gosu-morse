@@ -20,6 +20,7 @@ module Colors
   NODE_ACTIVE = Gosu::Color.new(255, 144, 144, 255)
   MENU = darken(WHITE, 0.25)
   TEXT_HIGHLIGHT = NODE_ACTIVE
+  TEXT_PREVIEW = darken(WHITE, 0.7)
   CURSOR = WHITE
   DAH = MENU
   DIT = MENU

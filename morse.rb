@@ -115,13 +115,15 @@ class Morse < Gosu::Window
   def button_down(id)
     char = Gosu.button_id_to_char(id)
     if char.between?("a", "z") or char.between?("0", "9") or char == " "
-      transmit(char)
+      add_char(char)
     else
       case id
+      when Gosu::KB_BACKSPACE
+        delete_char
       when Gosu::KB_ESCAPE
         full_reset
       when Gosu::KB_RETURN
-        start_tone
+        start_tone unless @now <= @next_at
       when Gosu::KB_LEFT
         left_down
       when Gosu::KB_RIGHT
@@ -135,7 +137,7 @@ class Morse < Gosu::Window
   def button_up(id)
     case id
     when Gosu::KB_RETURN
-      stop_tone
+      stop_tone unless @now <= @next_at
     when Gosu::KB_LEFT
       left_up
     when Gosu::KB_RIGHT
@@ -255,6 +257,7 @@ class Morse < Gosu::Window
 
   def write(char)
     @text.text += char
+    @text.preview = @text.preview[1..-1] unless @text.preview.empty?
     @text.highlighting = true
     @decoded = char
   end
@@ -270,19 +273,30 @@ class Morse < Gosu::Window
     end
   end
 
-  def transmit(char)
+  def add_char(char)
     char.upcase!
     if @now > @next_at
       @transmit_code = get_code(char) if char != " "
+      @text.preview = char
     else
       @transmit_word += char
+      @text.preview += char
+    end
+  end
+
+  def delete_char
+    unless @transmit_word.empty?
+      @transmit_word = @transmit_word[0..-2]
+      @text.preview = @text.preview[0..-2] unless @text.preview.empty?
     end
   end
 
   def transmit_next
-    if @transmit_code.empty? and !@transmit_word.empty?
-      @transmit_code = get_code(@transmit_word[0])
-      @transmit_word = @transmit_word[1..-1]
+    if @transmit_code.empty?
+      if !@transmit_word.empty?
+        @transmit_code = get_code(@transmit_word[0])
+        @transmit_word = @transmit_word[1..-1]
+      end
     end
     symbol = @transmit_code[0]
     @transmit_code = @transmit_code[1..-1]

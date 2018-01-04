@@ -1,6 +1,8 @@
 require_relative 'colors'
 
 class Tree
+  FONT_NAME = "fonts/bold/Ubuntu-B.ttf"
+
   DATA = {
     "A" => ".-",
     "B" => "-...",
@@ -50,7 +52,7 @@ class Tree
     build_tree
     @circle = Gosu::Image.new("circle.png", :tileable => true)
     @circle_active = Gosu::Image.new("circle_thick.png", :tileable => true)
-    @font = Gosu::Font.new(26, name: "fonts/bold/Ubuntu-B.ttf")
+    @font = Gosu::Font.new(26, name: FONT_NAME)
     reset
   end
 

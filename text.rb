@@ -1,5 +1,5 @@
 class Text
-  FONT = 'fonts/mono/UbuntuMono-R.ttf'
+  FONT_NAME = "fonts/mono/UbuntuMono-R.ttf"
   FONT_HEIGHT = 60
   LINE_HEIGHT = 60
   MARGIN = 40
@@ -9,26 +9,57 @@ class Text
   CURSOR_CHAR = "⎸"
   CURSOR_BLINK_RATE = 600
 
-  attr_reader :text
   attr_reader :highlighting
+  attr_reader :preview
 
   def initialize(morse)
     @morse = morse
-    @font = Gosu::Font.new(FONT_HEIGHT, name: FONT)
+    @font = Gosu::Font.new(FONT_HEIGHT, name: FONT_NAME)
+    @text = ""
+    @preview = ""
     reset
   end
 
   def reset
     self.text = "\n" * NUMBER_LINES
+    self.preview = ""
+  end
+
+  def text
+    @lines.join("\n")
   end
 
   def text=(new_text)
-    lines = wrap(new_text, LINE_WIDTH)
-    if lines.size > NUMBER_LINES
-      lines = lines[-NUMBER_LINES..-1]
+    @lines = wrap(new_text, LINE_WIDTH)
+    if @lines.size > NUMBER_LINES
+      @lines = @lines[-NUMBER_LINES..-1]
     end
-    @text = lines.join("\n")
-    last = lines[-1]
+    render
+  end
+
+  def highlighting=(val)
+    @highlighting = val
+    render
+  end
+
+  def preview=(val)
+    @preview = val
+    render
+  end
+
+  def draw
+    if @morse.now % (CURSOR_BLINK_RATE * 2) >= CURSOR_BLINK_RATE
+      @image_cursor.draw(MARGIN, POSITION, 0)
+    end
+    @image_text.draw(MARGIN, POSITION, 0)
+    @image_highlight.draw(MARGIN, POSITION, 0)
+    @image_preview.draw(MARGIN, POSITION, 0)
+  end
+
+  private
+
+  def render
+    last = @lines[-1]
     y_last = (NUMBER_LINES - 1) * LINE_HEIGHT
     if @highlighting and last.size > 1 and last[-1] == " "
       highlight_chars = 2
@@ -42,7 +73,7 @@ class Text
       @font.draw(cursor, 0, y_last, 0, 1.0, 1.0, Colors::CURSOR)
     end
     @image_text = Gosu.record(Morse::WIDTH, 500) do
-      lines.each_with_index do |line, index|
+      @lines.each_with_index do |line, index|
         y = index * LINE_HEIGHT
         color = Colors::darken(Colors::WHITE, (NUMBER_LINES - 1 - index) * 0.0625 + 0.25)
         line = line[0..-highlight_chars-1] if index == NUMBER_LINES - 1
@@ -55,22 +86,11 @@ class Text
         @font.draw(highlight, 0, y_last, 0, 1.0, 1.0, Colors::TEXT_HIGHLIGHT)
       end
     end
-  end
-
-  def highlighting=(val)
-    @highlighting = val
-    self.text = @text
-  end
-
-  def draw
-    if @morse.now % (CURSOR_BLINK_RATE * 2) >= CURSOR_BLINK_RATE
-      @image_cursor.draw(MARGIN, POSITION, 0)
+    @image_preview = Gosu.record(Morse::WIDTH, 500) do
+      preview = " " * last.size + @preview
+      @font.draw(preview, 0, y_last, 0, 1.0, 1.0, Colors::TEXT_PREVIEW)
     end
-    @image_text.draw(MARGIN, POSITION, 0)
-    @image_highlight.draw(MARGIN, POSITION, 0)
   end
-
-  private
 
   def wrap(s, width)
     s.split(/\n/, -1).map{ |l| wrap_line(l, width) }.flatten
