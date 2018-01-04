@@ -3,11 +3,13 @@ require_relative 'menu'
 require_relative 'tree'
 require_relative 'colors'
 require_relative 'serial_interface'
+require_relative 'text'
 
 class Morse < Gosu::Window
   SAMPLE_FREQUENCY = 440
   WIDTH = 1600
   HEIGHT = 900
+  HISTORY_POSITION = 350
 
   attr_accessor :cpm
   attr_accessor :speed
@@ -35,6 +37,7 @@ class Morse < Gosu::Window
     @menu = Menu.new(self)
     @tree = Tree.new(self)
     @serial = SerialInterface.new(self)
+    @text = Text.new(self)
   end
 
   def dit_length # in ms
@@ -102,16 +105,17 @@ class Morse < Gosu::Window
   end
 
   def draw
-    draw_history(@history, 100, 30) do |block|
+    draw_history(@history, HISTORY_POSITION, 30) do |block|
       duration = block[:width] * 1000 / @speed
       duration = [[duration, dit_length].max, dah_length].min
       p = (duration - dit_length) / (dah_length - dit_length)
       Colors::mix(Colors::DIT_ACTIVE, Colors::DAH_ACTIVE, p)
     end
-    draw_history(@history_dit, 140, 4) { Colors::DIT_ACTIVE }
-    draw_history(@history_dah, 150, 4) { Colors::DAH_ACTIVE }
+    draw_history(@history_dit, HISTORY_POSITION + 40, 4) { Colors::DIT_ACTIVE }
+    draw_history(@history_dah, HISTORY_POSITION + 50, 4) { Colors::DAH_ACTIVE }
     @menu.draw
     @tree.draw
+    @text.draw
   end
 
   def button_down(id)
@@ -248,7 +252,7 @@ class Morse < Gosu::Window
   end
 
   def write(char)
-    print char
+    @text.text += char
     @decoded = char
   end
 end
