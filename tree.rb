@@ -98,11 +98,21 @@ class Tree
     @font.draw_rel(text, x, y, 0, 0.5, 0.5, 1.0, 1.0, color)
   end
 
-  def draw_line(x1, y1, x2, y2, color, thickness)
+  def draw_line(x1, y1, x2, y2, color, thickness, dashed = false)
     angle = Gosu.angle(x1, y1, x2, y2)
     distance = Gosu.distance(x1, y1, x2, y2)
+    if dashed
+      element_length = 3 * thickness
+    else
+      element_length = thickness
+    end
+    segment_length = element_length + 1.2 * thickness
     @morse.rotate(angle, x1, y1) do
-      @morse.draw_rect(x1 - thickness / 2.0, y1 - distance, thickness, distance, color)
+      y = y1
+      (distance / segment_length).to_i.times do
+        @morse.draw_rect(x1 - thickness / 2.0, y - distance, thickness, element_length, color)
+        y += segment_length
+      end
     end
   end
 
@@ -121,7 +131,7 @@ class Tree
         color = Colors::darken(color, INACTIVE_DARKEN)
         thickness = LINE_THICKNESS
       end
-      draw_line(x, y, xx, yy, color, thickness)
+      draw_line(x, y, xx, yy, color, thickness, true)
       draw_tree(node[:dah], level + 1, xx, yy)
     end
     if node[:dit]
