@@ -15,6 +15,10 @@ class Text
   def initialize(morse)
     @morse = morse
     @font = Gosu::Font.new(FONT_HEIGHT, name: FONT)
+    reset
+  end
+
+  def reset
     self.text = "\n" * NUMBER_LINES
   end
 

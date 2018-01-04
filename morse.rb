@@ -27,6 +27,8 @@ class Morse < Gosu::Window
     @last_time = 0
     @next_at = 0
     @now = 0
+    @transmit_word = ""
+    @transmit_code = ""
     
     # configurable options
     @frequency = 660
@@ -57,21 +59,13 @@ class Morse < Gosu::Window
     7 * dit_length
   end
 
-  def word_break_detection
-    word_break + dit_length
-  end
-
-  def letter_break_detection
-    letter_break + dit_length
-  end
-
-  def large_break_detection
-    5 * word_break_detection
+  def large_break
+    5 * word_break
   end
 
   def move_history(history, delta, down)
     history.map! do |block|
-      block[:pos] += @speed * delta / 1000
+      block[:pos] += @speed * delta / 1000.0
       block
     end
     history.reject!{ |block| block[:pos] > WIDTH }
@@ -119,21 +113,28 @@ class Morse < Gosu::Window
   end
 
   def button_down(id)
-    case id
-    when Gosu::KB_SPACE
-      start_tone
-    when Gosu::KB_LEFT
-      left_down
-    when Gosu::KB_RIGHT
-      right_down
+    char = Gosu.button_id_to_char(id)
+    if char.between?("a", "z") or char.between?("0", "9") or char == " "
+      transmit(char)
     else
-      super
+      case id
+      when Gosu::KB_ESCAPE
+        full_reset
+      when Gosu::KB_RETURN
+        start_tone
+      when Gosu::KB_LEFT
+        left_down
+      when Gosu::KB_RIGHT
+        right_down
+      else
+        super
+      end
     end
   end
 
   def button_up(id)
     case id
-    when Gosu::KB_SPACE
+    when Gosu::KB_RETURN
       stop_tone
     when Gosu::KB_LEFT
       left_up
@@ -190,7 +191,9 @@ class Morse < Gosu::Window
   def keyer_next
     @dah_pressed ||= @dah_down
     @dit_pressed ||= @dit_down
-    if @dah_pressed && @dit_pressed
+    if !@transmit_word.empty? or !@transmit_code.empty?
+      transmit_next
+    elsif @dah_pressed && @dit_pressed
       if @last_was_dah
         play_dit
       else
@@ -222,9 +225,7 @@ class Morse < Gosu::Window
 
   def stop_tone
     decode_tone(@now - @last_tone_event) if @last_tone_event
-    if @channel and @channel.playing?
-      @channel.stop
-    end
+    @channel.stop if @channel and @channel.playing?
     @sending = false
     @stop_tone_at = nil
     @last_tone_event = @now
@@ -239,15 +240,15 @@ class Morse < Gosu::Window
   end
 
   def decode_pause(pause)
-    if pause > letter_break_detection and !@decoded
+    if pause > letter_break and !@decoded
       symbol = @tree.symbol
       symbol = "�" unless symbol
       write symbol
     end
-    if pause > large_break_detection
+    if pause > large_break
       write "\n" if @decoded != "\n"
       @tree.reset
-    elsif pause > word_break_detection
+    elsif pause > word_break
       write " " if @decoded != " "
     end
   end
@@ -256,6 +257,60 @@ class Morse < Gosu::Window
     @text.text += char
     @text.highlighting = true
     @decoded = char
+  end
+
+  # . = dit
+  # - = dah
+  # d = dot break
+  def get_code(char)
+    if char == " "
+      "dddd"
+    elsif result = @tree.get_code(char)
+      result + "ddd"
+    end
+  end
+
+  def transmit(char)
+    char.upcase!
+    if @now > @next_at
+      @transmit_code = get_code(char) if char != " "
+    else
+      @transmit_word += char
+    end
+  end
+
+  def transmit_next
+    if @transmit_code.empty? and !@transmit_word.empty?
+      @transmit_code = get_code(@transmit_word[0])
+      @transmit_word = @transmit_word[1..-1]
+    end
+    symbol = @transmit_code[0]
+    @transmit_code = @transmit_code[1..-1]
+    case symbol
+    when "."
+      play_dit
+    when "-"
+      play_dah
+    when "d"
+      @next_at = @now + dit_length
+    end
+  end
+
+  def full_reset
+    @history = []
+    @history_dit = []
+    @history_dah = []
+    @last_time = 0
+    @next_at = 0
+    @now = 0
+    @transmit_word = ""
+    @transmit_code = ""
+    @channel.stop if @channel and @channel.playing?
+    @sending = nil
+    @stop_tone_at = nil
+    @last_tone_event = nil
+    @text.reset
+    @tree.reset
   end
 end
 

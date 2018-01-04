@@ -24,8 +24,6 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 
 ## TODO
 
-* decoding
-* typing of letters through the keyboard
 * automatic CpM detection
 * swap left and right paddle (and key and tree)
 * Use Gosu.record to speed up tree drawing

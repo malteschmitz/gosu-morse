@@ -82,6 +82,10 @@ class Tree
     @current_node[:active] = true if @current_node
   end
 
+  def get_code(char)
+    DATA[char] || ""
+  end
+
   private
 
   def disable_tree
