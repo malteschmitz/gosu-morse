@@ -9,7 +9,7 @@ class Morse < Gosu::Window
   SAMPLE_FREQUENCY = 440
   WIDTH = 1600
   HEIGHT = 900
-  HISTORY_POSITION = 350
+  HISTORY_POSITION = 345
 
   attr_accessor :cpm
   attr_accessor :speed
@@ -214,6 +214,7 @@ class Morse < Gosu::Window
     if @decoded
       @decoded = nil
       @tree.reset
+      @text.highlighting = false
     end
     @last_tone_event = @now
     @history << {width: 0, pos: 0}
@@ -253,6 +254,7 @@ class Morse < Gosu::Window
 
   def write(char)
     @text.text += char
+    @text.highlighting = true
     @decoded = char
   end
 end

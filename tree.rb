@@ -39,7 +39,7 @@ class Tree
     "9" => "----.",
     "0" => "-----"
   }
-  LEVEL_DISTANCE = 70
+  LEVEL_DISTANCE = 75
   LINE_THICKNESS = 3
   LINE_THICKNESS_ACTIVE = 5
   NUMBER_LEVELS = 5
