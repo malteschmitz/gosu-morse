@@ -30,7 +30,7 @@ class Morse < Gosu::Window
     
     # configurable options
     @frequency = 660
-    @speed = 1000 # pixel movement per second
+    @speed = 200 # pixel movement per second
     @iambic_mode_b = false # false -> using mode B
     @cpm = 50
     

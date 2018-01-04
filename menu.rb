@@ -101,10 +101,22 @@ class Menu
       @morse.cpm += 5 if @morse.cpm < 100
     end
     keyboard_action(Gosu::KB_F2) do
-      @morse.speed -= 200 if @morse.speed > 200
+      if @morse.speed > 400
+        @morse.speed -= 100
+      elsif @morse.speed > 50
+        @morse.speed -= 50
+      elsif @morse.speed > 10
+        @morse.speed -= 10
+      end
     end
     keyboard_action(Gosu::KB_F3) do
-      @morse.speed += 200 if @morse.speed < 2000
+      if @morse.speed < 50
+        @morse.speed += 10
+      elsif @morse.speed < 400
+        @morse.speed += 50
+      elsif @morse.speed < 1000
+        @morse.speed += 100
+      end
     end
     keyboard_action(Gosu::KB_F4) do
       set_frequency(@frequency_index + 1) if @frequency_index < FREQUENCIES.size - 1
