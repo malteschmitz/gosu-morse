@@ -25,5 +25,12 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 ## TODO
 
 * start if tty not available
+* decoding
+* typing of letters through the keyboard
+* automatic CpM detection
 * swap left and right paddle (and key and tree)
 * Use Gosu.record to speed up tree drawing
+
+## Further Ideas
+
+* Contest simulation: Computer calls CQ, user can answer, computer repeats call + 5NN, user gives 5NN, call ends up in a log
