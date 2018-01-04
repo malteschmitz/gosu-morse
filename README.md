@@ -26,3 +26,4 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 
 * start if tty not available
 * swap left and right paddle (and key and tree)
+* Use Gosu.record to speed up tree drawing

@@ -44,7 +44,6 @@ class Tree
   LINE_THICKNESS_ACTIVE = 5
   NUMBER_LEVELS = 5
   MINIMAL_SIBLING_DISTANCE = 23.5
-  INACTIVE_DARKEN = 0.4
 
   def initialize(morse)
     @morse = morse
@@ -84,8 +83,7 @@ class Tree
   end
 
   def draw_node(x, y, text, active = false)
-    color = Colors::NODE
-    color = Colors::darken(color, INACTIVE_DARKEN) unless active
+    color = active ? Colors::NODE_ACTIVE : Colors::NODE
     offset = @circle.width / 4
     xx = x - offset
     yy = y - offset
@@ -106,7 +104,7 @@ class Tree
     else
       element_length = thickness
     end
-    segment_length = element_length + 1.2 * thickness
+    segment_length = element_length + 1.5 * thickness
     @morse.rotate(angle, x1, y1) do
       y = y1
       (distance / segment_length).to_i.times do
@@ -124,11 +122,11 @@ class Tree
     if node[:dah]
       xx = x + sibling_distance(level)
       yy = y + LEVEL_DISTANCE
-      color = Colors::DAH
       if node[:dah][:active]
+        color = Colors::DAH_ACTIVE
         thickness = LINE_THICKNESS_ACTIVE
       else
-        color = Colors::darken(color, INACTIVE_DARKEN)
+        color = Colors::DAH
         thickness = LINE_THICKNESS
       end
       draw_line(x, y, xx, yy, color, thickness, true)
@@ -137,11 +135,11 @@ class Tree
     if node[:dit]
       xx = x - sibling_distance(level)
       yy = y + LEVEL_DISTANCE
-      color = Colors::DIT
       if node[:dit][:active]
+        color = Colors::DIT_ACTIVE
         thickness = LINE_THICKNESS_ACTIVE
       else
-        color = Colors::darken(color, INACTIVE_DARKEN)
+        color = Colors::DIT
         thickness = LINE_THICKNESS
       end
       draw_line(x, y, xx, yy, color, thickness)

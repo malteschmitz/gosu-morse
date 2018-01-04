@@ -113,10 +113,10 @@ class Morse < Gosu::Window
       duration = block[:width] * 1000 / @speed
       duration = [[duration, dit_length].max, dah_length].min
       p = (duration - dit_length) / (dah_length - dit_length)
-      Colors::mix(Colors::DIT, Colors::DAH, p)
+      Colors::mix(Colors::DIT_ACTIVE, Colors::DAH_ACTIVE, p)
     end
-    draw_history(@history_dit, 140, 4) { Colors::DIT }
-    draw_history(@history_dah, 150, 4) { Colors::DAH }
+    draw_history(@history_dit, 140, 4) { Colors::DIT_ACTIVE }
+    draw_history(@history_dah, 150, 4) { Colors::DAH_ACTIVE }
     @menu.draw
     @tree.draw
   end

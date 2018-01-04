@@ -1,5 +1,6 @@
+require_relative 'colors'
+
 class Menu
-  FONT_COLOR = Gosu::Color::GRAY
   BUTTON_REPEAT_INITIAL = 300 # in ms
   BUTTON_REPEAT = 100 # in ms
 
@@ -50,7 +51,7 @@ class Menu
       {text: "#{iambic_text} [F6]", at: 700}
     ]
     items.each_with_index do |item, i|
-      @font.draw(item[:text], 10 + item[:at], Morse::HEIGHT - 30, 0, 1.0, 1.0, FONT_COLOR)
+      @font.draw(item[:text], 10 + item[:at], Morse::HEIGHT - 30, 0, 1.0, 1.0, Colors::MENU)
     end
   end
 
