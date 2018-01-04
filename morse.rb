@@ -54,6 +54,18 @@ class Morse < Gosu::Window
     7 * dit_length
   end
 
+  def word_break_detection
+    word_break + dit_length
+  end
+
+  def letter_break_detection
+    letter_break + dit_length
+  end
+
+  def large_break_detection
+    5 * word_break_detection
+  end
+
   def move_history(history, delta, down)
     history.map! do |block|
       block[:pos] += @speed * delta / 1000
@@ -222,15 +234,15 @@ class Morse < Gosu::Window
   end
 
   def decode_pause(pause)
-    if pause > letter_break and !@decoded
+    if pause > letter_break_detection and !@decoded
       symbol = @tree.symbol
       symbol = "�" unless symbol
       write symbol
     end
-    if pause > 5 * word_break
+    if pause > large_break_detection
       write "\n" if @decoded != "\n"
       @tree.reset
-    elsif pause > word_break
+    elsif pause > word_break_detection
       write " " if @decoded != " "
     end
   end
