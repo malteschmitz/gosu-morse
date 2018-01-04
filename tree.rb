@@ -50,7 +50,7 @@ class Tree
     build_tree
     @circle = Gosu::Image.new("circle.png", :tileable => true)
     @circle_active = Gosu::Image.new("circle_thick.png", :tileable => true)
-    @font = Gosu::Font.new(26)
+    @font = Gosu::Font.new(26, name: "fonts/bold/Ubuntu-B.ttf")
     reset
   end
 

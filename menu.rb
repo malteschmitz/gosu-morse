@@ -3,6 +3,7 @@ require_relative 'colors'
 class Menu
   BUTTON_REPEAT_INITIAL = 300 # in ms
   BUTTON_REPEAT = 100 # in ms
+  MENU_ITEM_SPACE = 30 # in px
 
   FREQUENCIES = [
     {f: 880000, name: "a''"},
@@ -25,13 +26,27 @@ class Menu
   def initialize(morse)
     @morse = morse
     set_frequency(3)
-    @font = Gosu::Font.new(20)
+    @menu_font = Gosu::Font.new(20)
+    build_widths
     @last_button = {}
   end
 
   def set_frequency(index)
     @frequency_index = index
     @morse.frequency = FREQUENCIES[index][:f] / 1000.0
+  end
+
+  def build_widths
+    items = [
+      "60 FPS",
+      "100 CpM [▼/▲]",
+      "2000 px/s [F2/F3]",
+      "1000 Hz = a'' [F4/F5]",
+      "Iambic Mode B [F6]"
+    ]
+    @widths = items.map do |item|
+      @menu_font.text_width(item)
+    end
   end
 
   def draw
@@ -44,14 +59,18 @@ class Menu
       iambic_text += "A"
     end
     items = [
-      {text: "#{Gosu.fps} FPS", at: 0},
-      {text: "#{@morse.cpm} CpM [▼/▲]", at: 100},
-      {text: "#{@morse.speed} px/s [F2/F3]", at: 300},
-      {text: "#{frequency_text} [F4/F5]", at: 500},
-      {text: "#{iambic_text} [F6]", at: 700}
+      "#{Gosu.fps} FPS",
+      "#{@morse.cpm} CpM [▼/▲]",
+      "#{@morse.speed} px/s [F2/F3]",
+      "#{frequency_text} [F4/F5]",
+      "#{iambic_text} [F6]"
     ]
+    x = (@widths.sum + (items.size - 1) * MENU_ITEM_SPACE)/2
+    y = Morse::HEIGHT - 30
     items.each_with_index do |item, i|
-      @font.draw(item[:text], 10 + item[:at], Morse::HEIGHT - 30, 0, 1.0, 1.0, Colors::MENU)
+      xx = x + @widths[i] - @menu_font.text_width(item)
+      @menu_font.draw(item, xx, y, 0, 1.0, 1.0, Colors::MENU)
+      x += @widths[i] + MENU_ITEM_SPACE
     end
   end
 
