@@ -24,7 +24,6 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 
 ## TODO
 
-* map full screen switcher to F11 menu item
 * swap left and right paddle (and key and tree)
   and display key assignment for left, right and return
 * Use Gosu.record to speed up tree and menu drawing

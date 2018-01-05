@@ -130,8 +130,6 @@ class Morse < Gosu::Window
         left_down
       when Gosu::KB_RIGHT
         right_down
-      else
-        super
       end
     end
   end
@@ -144,8 +142,6 @@ class Morse < Gosu::Window
       left_up
     when Gosu::KB_RIGHT
       right_up
-    else
-      super
     end
   end
   
@@ -346,6 +342,10 @@ class Morse < Gosu::Window
     @last_tone_event = nil
     @text.reset
     @tree.reset
+  end
+
+  def needs_cursor?
+    not fullscreen?
   end
 end
 
