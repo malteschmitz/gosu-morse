@@ -24,8 +24,6 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 
 ## TODO
 
-* Iambic A Mode ignores other paddle press entirely if it starts AND ends while sending --> which is exactly how Iambic A should behave. It's not a bug, it's a feature.
-* automatic CpM detection
 * swap left and right paddle (and key and tree)
   and display key assignment for left, right and return
 * Use Gosu.record to speed up tree drawing

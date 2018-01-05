@@ -12,6 +12,7 @@ class Morse < Gosu::Window
   HISTORY_POSITION = 345
 
   attr_accessor :cpm
+  attr_reader :auto_cpm
   attr_accessor :speed
   attr_accessor :frequency
   attr_accessor :iambic_mode_b
@@ -29,6 +30,7 @@ class Morse < Gosu::Window
     @now = 0
     @transmit_word = ""
     @transmit_code = ""
+    @dit_length_history = []
     
     # configurable options
     @frequency = 660
@@ -43,10 +45,10 @@ class Morse < Gosu::Window
   end
 
   def dit_length # in ms
-    6.0 / (@cpm) * 1000
+    6000.0 / (@cpm)
   end
 
-  def dit_or_dash 
+  def dit_or_dah 
     2 * dit_length
   end
 
@@ -175,6 +177,7 @@ class Morse < Gosu::Window
   alias right_down dah_down
 
   def play_dit
+    self.auto_cpm = false
     start_tone
     @stop_tone_at = @now + dit_length
     @next_at = @stop_tone_at + dit_length
@@ -183,6 +186,7 @@ class Morse < Gosu::Window
   end
 
   def play_dah
+    self.auto_cpm = false
     start_tone
     @stop_tone_at = @now + dah_length
     @next_at = @stop_tone_at + dit_length
@@ -233,26 +237,43 @@ class Morse < Gosu::Window
     @last_tone_event = @now
   end
 
-  def decode_tone(pause)
-    if pause > dit_or_dash
+  def decode_tone(length)
+    add_tone_length(length) if @auto_cpm
+    if length > dit_or_dah
       @tree.go("-")
     else
       @tree.go(".")
     end
   end
 
-  def decode_pause(pause)
-    if pause > letter_break and !@decoded
+  def decode_pause(length)
+    if length > letter_break and !@decoded
       symbol = @tree.symbol
       symbol = "�" unless symbol
       write symbol
     end
-    if pause > large_break
+    if length > large_break
       write "\n" if @decoded != "\n"
       @tree.reset
-    elsif pause > word_break
+    elsif length > word_break
       write " " if @decoded != " "
     end
+  end
+
+  def auto_cpm=(val)
+    @auto_cpm = val
+    unless @auto_cpm
+       @cpm = (@cpm * 1.0 / Menu::CPM_STEP).round * Menu::CPM_STEP
+       @cpm = [[@cpm, Menu::CPM_MIN].max, Menu::CPM_MAX].min
+    end
+  end
+
+  def add_tone_length(length)
+    @dit_length_history.reject! { |e| @now - e[:time] > 5000 }
+    @dit_length_history << {time: @now, length: length / 2.0}
+    average_dit_length = @dit_length_history.sum { |e| e[:length] } * 1.0 / (@dit_length_history.size)
+    @cpm = (6000.0 / average_dit_length).round
+    @cpm = [[@cpm, Menu::CPM_MIN].max, Menu::CPM_MAX].min
   end
 
   def write(char)

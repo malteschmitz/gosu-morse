@@ -4,6 +4,11 @@ class Menu
   BUTTON_REPEAT_INITIAL = 300 # in ms
   BUTTON_REPEAT = 100 # in ms
   MENU_ITEM_SPACE = 30 # in px
+  CPM_STEP = 5
+  CPM_MIN = 10
+  CPM_MAX = 100
+  CHECKBOX_CHAR = "▢"
+  CHECKBOX_CHECKED_CHAR = "✔"
 
   FREQUENCIES = [
     {f: 880000, name: "a''"},
@@ -40,9 +45,10 @@ class Menu
     items = [
       "60 FPS",
       "100 CpM [▼/▲]",
-      "2000 px/s [F2/F3]",
-      "1000 Hz = a'' [F4/F5]",
-      "Iambic Mode B [F6]"
+      CHECKBOX_CHAR + " Auto CpM [F2]",
+      "2000 px/s [F2/F2]",
+      "1000 Hz = a'' [F2/F2]",
+      "Iambic Mode B [F2]"
     ]
     @widths = items.map do |item|
       @menu_font.text_width(item)
@@ -58,14 +64,20 @@ class Menu
     else
       iambic_text += "A"
     end
+    if @morse.auto_cpm
+      auto_cpm = CHECKBOX_CHECKED_CHAR
+    else
+      auto_cpm = CHECKBOX_CHAR
+    end
     items = [
       "#{Gosu.fps} FPS",
       "#{@morse.cpm} CpM [▼/▲]",
+      "#{auto_cpm} auto CpM [F8]",
       "#{@morse.speed} px/s [F2/F3]",
       "#{frequency_text} [F4/F5]",
       "#{iambic_text} [F6]"
     ]
-    x = (@widths.sum + (items.size - 1) * MENU_ITEM_SPACE)/2
+    x = (Morse::WIDTH - @widths.sum - (items.size - 1) * MENU_ITEM_SPACE) / 2.0
     y = Morse::HEIGHT - 30
     items.each_with_index do |item, i|
       xx = x + @widths[i] - @menu_font.text_width(item)
@@ -95,10 +107,12 @@ class Menu
 
   def read_keyboard
     keyboard_action(Gosu::KB_DOWN) do
-      @morse.cpm -= 5 if @morse.cpm > 10
+      @morse.auto_cpm = false
+      @morse.cpm -= CPM_STEP if @morse.cpm > CPM_MIN
     end
     keyboard_action(Gosu::KB_UP) do
-      @morse.cpm += 5 if @morse.cpm < 100
+      @morse.auto_cpm = false
+      @morse.cpm += CPM_STEP if @morse.cpm < CPM_MAX
     end
     keyboard_action(Gosu::KB_F2) do
       if @morse.speed > 400
@@ -126,6 +140,9 @@ class Menu
     end
     keyboard_action(Gosu::KB_F6) do
       @morse.iambic_mode_b = !@morse.iambic_mode_b
+    end
+    keyboard_action(Gosu::KB_F8) do
+      @morse.auto_cpm = !@morse.auto_cpm
     end
   end
 end
