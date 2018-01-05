@@ -24,12 +24,23 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 
 ## TODO
 
-* Iambic A Mode ignores other paddle press entirely if it starts AND ends while sending
-* pause (pause everything and freeze screen)
+* Iambic A Mode ignores other paddle press entirely if it starts AND ends while sending --> which is exactly how Iambic A should behave. It's not a bug, it's a feature.
 * automatic CpM detection
 * swap left and right paddle (and key and tree)
+  and display key assignment for left, right and return
 * Use Gosu.record to speed up tree drawing
+* pause (pause everything and freeze screen)
 
 ## Further Ideas
 
-* Contest simulation: Computer calls CQ, user can answer, computer repeats call + 5NN, user gives 5NN, call ends up in a log
+* DXpedition simulation:
+  1. Computer calls CQ or QRZ
+  2. user answers with her call
+  3. if user's input looks like a call:
+       computer repeats user's call + 5NN
+  4. user gives 5NN TU
+  5. if user's input looks like report:
+       user's call ends up in a log and
+       computer calls CQ or QRZ (goto 1)
+     else:
+       computer repeats user's call + 5NN or calls CQ (goto 1)
