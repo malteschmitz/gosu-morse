@@ -9,6 +9,7 @@ class Menu
   CPM_MAX = 100
   CHECKBOX_CHAR = "▢"
   CHECKBOX_CHECKED_CHAR = "✔"
+  FONT_NAME = "fonts/bold/Ubuntu-B.ttf"
 
   FREQUENCIES = [
     {f: 880000, name: "a''"},
@@ -31,7 +32,7 @@ class Menu
   def initialize(morse)
     @morse = morse
     set_frequency(3)
-    @menu_font = Gosu::Font.new(20)
+    @menu_font = Gosu::Font.new(20, name: FONT_NAME)
     build_widths
     @last_button = {}
   end
