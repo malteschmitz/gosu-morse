@@ -383,10 +383,11 @@ class Morse < Gosu::Window
     @now = 0
     @transmit_word = ""
     @transmit_code = ""
-    @channel.stop if @channel and @channel.playing?
+    beep_off
     @sending = nil
     @stop_tone_at = nil
     @last_tone_event = nil
+    @pause = nil
     @text.reset
     @tree.reset
   end
