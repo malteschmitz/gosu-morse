@@ -7,8 +7,6 @@ class Menu
   CPM_STEP = 5
   CPM_MIN = 10
   CPM_MAX = 100
-  CHECKBOX_CHAR = "▢"
-  CHECKBOX_CHECKED_CHAR = "✔"
   FONT_NAME = "fonts/bold/Ubuntu-B.ttf"
 
   FREQUENCIES = [
@@ -48,7 +46,7 @@ class Menu
       "Key [RET]",
       "·/− [F7]",
       "100 CpM [▼/▲]",
-      CHECKBOX_CHAR + " auto [F2]",
+      "auto [F2]",
       "2000 px/s [F2/F2]",
       "1000 Hz [F2/F2]",
       "Iambic B [F2]",
@@ -69,39 +67,35 @@ class Menu
     else
       iambic_text += "A"
     end
-    if @morse.auto_cpm
-      auto_cpm_text = CHECKBOX_CHECKED_CHAR
-    else
-      auto_cpm_text = CHECKBOX_CHAR
-    end
     if @morse.swap_left_right
       swap_left_right_text = "−/•"
     else
       swap_left_right_text = "•/−"
     end
-    if @morse.pause
-      pause_text = "Cont."
-    else
-      pause_text = "Pause"
-    end
     items = [
-      "#{Gosu.fps} FPS",
-      "Key [RET]",
-      "#{swap_left_right_text} [F7]",
-      "#{@morse.cpm} CpM [▼/▲]",
-      "#{auto_cpm_text} auto [F8]",
-      "#{@morse.speed} px/s [F2/F3]",
-      "#{frequency_text} Hz [F4/F5]",
-      "#{iambic_text} [F6]",
-      "Fullscreen [F11]",
-      "Clear [ESC]",
-      "#{pause_text} [F12]"
+      {text: "#{Gosu.fps} FPS"},
+      {text: "Key [RET]"},
+      {text: "#{swap_left_right_text} [F7]"},
+      {text: "#{@morse.cpm} CpM [▼/▲]"},
+      {text: "auto [F8]", active: @morse.auto_cpm},
+      {text: "#{@morse.speed} px/s [F2/F3]"},
+      {text: "#{frequency_text} Hz [F4/F5]"},
+      {text: "#{iambic_text} [F6]"},
+      {text: "Fullscreen [F11]", active: @morse.fullscreen?},
+      {text: "Clear [ESC]"},
+      {text: "Pause [F12]", active: @morse.pause}
     ]
     x = (Morse::WIDTH - @widths.sum - (items.size - 1) * MENU_ITEM_SPACE) / 2.0
     y = Morse::HEIGHT - 30
     items.each_with_index do |item, i|
-      xx = x + @widths[i] - @menu_font.text_width(item)
-      @menu_font.draw(item, xx, y, 0, 1.0, 1.0, Colors::MENU)
+      text = item[:text]
+      xx = x + @widths[i] - @menu_font.text_width(text)
+      if item[:active]
+        color = Colors::MENU_ACTIVE
+      else
+        color = Colors::MENU
+      end
+      @menu_font.draw(text, xx, y, 0, 1.0, 1.0, color)
       x += @widths[i] + MENU_ITEM_SPACE
     end
   end

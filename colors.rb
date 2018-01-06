@@ -18,11 +18,12 @@ module Colors
   DAH_ACTIVE = Gosu::Color.new(255, 255, 128, 128)
   DIT_ACTIVE = Gosu::Color.new(255, 255, 255, 128)
   NODE_ACTIVE = Gosu::Color.new(255, 144, 144, 255)
-  MENU = darken(WHITE, 0.25)
+  MENU = darken(WHITE, 0.5)
+  MENU_ACTIVE = WHITE
   TEXT_HIGHLIGHT = NODE_ACTIVE
   TEXT_PREVIEW = darken(WHITE, 0.7)
   CURSOR = WHITE
-  DAH = MENU
-  DIT = MENU
-  NODE = MENU
+  DAH = darken(WHITE, 0.25)
+  DIT = DAH
+  NODE = DAH
 end

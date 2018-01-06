@@ -22,10 +22,6 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 
         bundle install
 
-## ToDo
-
-* Include external font for menu to ensure cross platform consistency
-
 ## Further Ideas
 
 * DXpedition simulation:
