@@ -310,11 +310,13 @@ class Morse < Gosu::Window
   end
 
   def add_tone_length(length)
-    @dit_length_history.reject! { |e| @now - e[:time] > 5000 }
+    @dit_length_history.reject! { |e| @now - e[:time] > 7000 }
     @dit_length_history << {time: @now, length: length / 2.0}
-    average_dit_length = @dit_length_history.sum { |e| e[:length] } * 1.0 / (@dit_length_history.size)
-    @cpm = (6000.0 / average_dit_length).round
-    @cpm = [[@cpm, Menu::CPM_MIN].max, Menu::CPM_MAX].min
+    if @dit_length_history.size > 4
+      average_dit_length = @dit_length_history.sum { |e| e[:length] } * 1.0 / (@dit_length_history.size)
+      @cpm = (6000.0 / average_dit_length).round
+      @cpm = [[@cpm, Menu::CPM_MIN].max, Menu::CPM_MAX].min
+    end
   end
 
   def write(char)
