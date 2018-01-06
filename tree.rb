@@ -57,7 +57,7 @@ class Tree
   end
 
   def draw
-    draw_tree(@tree, 0, Morse::WIDTH / 2, Morse::HEIGHT / 2)
+    @image.draw(0, Morse::HEIGHT / 2, 0)
   end
 
   def symbol
@@ -70,6 +70,7 @@ class Tree
 
   def reset
     enable_tree
+    redraw
   end
 
   def go(code)
@@ -82,6 +83,7 @@ class Tree
       disable_tree
     end
     @current_node[:active] = true if @current_node
+    redraw
   end
 
   def get_code(char)
@@ -89,6 +91,12 @@ class Tree
   end
 
   private
+
+  def redraw
+    @image = Gosu.record(Morse::WIDTH, Morse::HEIGHT / 2) do
+      draw_tree(@tree, 0, Morse::WIDTH / 2, 0)
+    end
+  end
 
   def disable_tree
     disable_node(@tree)

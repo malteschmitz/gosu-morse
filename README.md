@@ -22,10 +22,6 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 
         bundle install
 
-## TODO
-
-* Use Gosu.record to speed up tree and menu drawing
-
 ## Further Ideas
 
 * DXpedition simulation:
