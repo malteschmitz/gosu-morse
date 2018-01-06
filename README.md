@@ -24,8 +24,6 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 
 ## TODO
 
-* swap left and right paddle (and key and tree)
-  and display key assignment for left, right and return
 * Use Gosu.record to speed up tree and menu drawing
 * pause (pause everything and freeze screen)
 

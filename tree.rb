@@ -145,7 +145,11 @@ class Tree
 
   def draw_tree(node, level, x, y)
     if node[:dah]
-      xx = x + sibling_distance(level)
+      if @morse.swap_left_right
+        xx = x - sibling_distance(level)
+      else
+        xx = x + sibling_distance(level)
+      end
       yy = y + LEVEL_DISTANCE
       if node[:dah][:active]
         color = Colors::DAH_ACTIVE
@@ -158,7 +162,11 @@ class Tree
       draw_tree(node[:dah], level + 1, xx, yy)
     end
     if node[:dit]
-      xx = x - sibling_distance(level)
+      if @morse.swap_left_right
+        xx = x + sibling_distance(level)
+      else
+        xx = x - sibling_distance(level)
+      end
       yy = y + LEVEL_DISTANCE
       if node[:dit][:active]
         color = Colors::DIT_ACTIVE
@@ -170,7 +178,7 @@ class Tree
       draw_line(x, y, xx, yy, color, thickness)
       draw_tree(node[:dit], level + 1, xx, yy)
     end
-    draw_node(x,y, node[:symbol] || "", node[:active])
+    draw_node(x, y, node[:symbol] || "", node[:active])
   end
 
   def add_symbol(node, symbol, code)

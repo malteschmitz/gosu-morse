@@ -16,6 +16,7 @@ class Morse < Gosu::Window
   attr_accessor :speed
   attr_accessor :frequency
   attr_accessor :iambic_mode_b
+  attr_accessor :swap_left_right
   attr_reader :now
 
   def initialize
@@ -167,10 +168,37 @@ class Morse < Gosu::Window
     @history_dah << {width: 0, pos: 0}
   end
 
-  alias left_up dit_up
-  alias left_down dit_down
-  alias right_up dah_up
-  alias right_down dah_down
+  def left_up
+    if @swap_left_right
+      dah_up
+    else
+      dit_up
+    end
+  end
+
+  def left_down
+    if @swap_left_right
+      dah_down
+    else
+      dit_down
+    end
+  end
+
+  def right_up
+    if @swap_left_right
+      dit_up
+    else
+      dah_up
+    end
+  end
+
+  def right_down
+    if @swap_left_right
+      dit_down
+    else
+      dah_down
+    end
+  end
 
   def play_dit
     self.auto_cpm = false

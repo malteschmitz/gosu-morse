@@ -44,13 +44,15 @@ class Menu
   def build_widths
     items = [
       "60 FPS",
+      "Key [RET]",
+      "·/− [F7]",
       "100 CpM [▼/▲]",
-      CHECKBOX_CHAR + " Auto CpM [F2]",
+      CHECKBOX_CHAR + " auto [F2]",
       "2000 px/s [F2/F2]",
       "1000 Hz = a'' [F2/F2]",
-      "Iambic Mode B [F2]",
-      CHECKBOX_CHAR + "Fullscreen [F11]",
-      "Clear [esc]"
+      "Iambic B [F2]",
+      "Fullscreen [F11]",
+      "Clear [ESC]"
     ]
     @widths = items.map do |item|
       @menu_font.text_width(item)
@@ -60,7 +62,7 @@ class Menu
   def draw
     frequency_text = (FREQUENCIES[@frequency_index][:f] / 1000.0).round
     frequency_text = "#{frequency_text} Hz = #{FREQUENCIES[@frequency_index][:name]}"
-    iambic_text = "Iambic Mode "
+    iambic_text = "Iambic "
     if @morse.iambic_mode_b
       iambic_text += "B"
     else
@@ -71,20 +73,22 @@ class Menu
     else
       auto_cpm_text = CHECKBOX_CHAR
     end
-    if @morse.fullscreen?
-      fullscreen_text = CHECKBOX_CHECKED_CHAR
+    if @morse.swap_left_right
+      swap_left_right_text = "−/•"
     else
-      fullscreen_text = CHECKBOX_CHAR
+      swap_left_right_text = "•/−"
     end
     items = [
       "#{Gosu.fps} FPS",
+      "Key [RET]",
+      "#{swap_left_right_text} [F7]",
       "#{@morse.cpm} CpM [▼/▲]",
-      "#{auto_cpm_text} auto CpM [F8]",
+      "#{auto_cpm_text} auto [F8]",
       "#{@morse.speed} px/s [F2/F3]",
       "#{frequency_text} [F4/F5]",
       "#{iambic_text} [F6]",
-      "#{fullscreen_text} Fullscreen [F11]",
-      "Clear [esc]"
+      "Fullscreen [F11]",
+      "Clear [ESC]"
     ]
     x = (Morse::WIDTH - @widths.sum - (items.size - 1) * MENU_ITEM_SPACE) / 2.0
     y = Morse::HEIGHT - 30
@@ -149,6 +153,9 @@ class Menu
     end
     keyboard_action(Gosu::KB_F6) do
       @morse.iambic_mode_b = !@morse.iambic_mode_b
+    end
+    keyboard_action(Gosu::KB_F7) do
+      @morse.swap_left_right = !@morse.swap_left_right
     end
     keyboard_action(Gosu::KB_F8) do
       @morse.auto_cpm = !@morse.auto_cpm
