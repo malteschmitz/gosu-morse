@@ -50,8 +50,12 @@ class Tree
   def initialize(morse)
     @morse = morse
     build_tree
-    @circle = Gosu::Image.new("circle.png", :tileable => true)
-    @circle_active = Gosu::Image.new("circle_thick.png", :tileable => true)
+    @circle = Gosu::Image.new("circle.png")
+    @circle_thick = Gosu::Image.new("circle_thick.png")
+    @dit = Gosu::Image.new("dit.png")
+    @dit_thick = Gosu::Image.new("dit_thick.png")
+    @dah = Gosu::Image.new("dah.png")
+    @dah_thick = Gosu::Image.new("dah_thick.png")
     @font = Gosu::Font.new(26, name: FONT_NAME)
     reset
   end
@@ -121,7 +125,7 @@ class Tree
     xx = x - offset
     yy = y - offset
     if active
-      circle = @circle_active
+      circle = @circle_thick
     else
       circle = @circle
     end
@@ -129,22 +133,30 @@ class Tree
     @font.draw_rel(text, x, y, 0, 0.5, 0.5, 1.0, 1.0, color)
   end
 
-  def draw_line(x1, y1, x2, y2, color, thickness, dashed = false)
-    angle = Gosu.angle(x1, y1, x2, y2)
+  # def draw_line(x1, y1, x2, y2, color, thickness, dashed = false)
+  #   angle = Gosu.angle(x1, y1, x2, y2)
+  #   distance = Gosu.distance(x1, y1, x2, y2)
+  #   if dashed
+  #     element_length = 3 * thickness
+  #   else
+  #     element_length = thickness
+  #   end
+  #   segment_length = element_length + 1.5 * thickness
+  #   @morse.rotate(angle, x1, y1) do
+  #     y = y1
+  #     (distance / segment_length).to_i.times do
+  #       @morse.draw_rect(x1 - thickness / 2.0, y - distance, thickness, element_length, color)
+  #       y += segment_length
+  #     end
+  #   end
+  # end
+
+  def draw_line(x1, y1, x2, y2, color, image)
+    angle = Gosu.angle(x1, y1, x2, y2) - 90
     distance = Gosu.distance(x1, y1, x2, y2)
-    if dashed
-      element_length = 3 * thickness
-    else
-      element_length = thickness
-    end
-    segment_length = element_length + 1.5 * thickness
-    @morse.rotate(angle, x1, y1) do
-      y = y1
-      (distance / segment_length).to_i.times do
-        @morse.draw_rect(x1 - thickness / 2.0, y - distance, thickness, element_length, color)
-        y += segment_length
-      end
-    end
+    thickness = image.height
+    image = image.subimage(0, 0, distance.round, thickness.round)
+    image.draw_rot(x1, y1, 0, angle, 0, 0.5, 1, 1, color)
   end
 
   def sibling_distance(level)
@@ -161,12 +173,12 @@ class Tree
       yy = y + LEVEL_DISTANCE
       if node[:dah][:active]
         color = Colors::DAH_ACTIVE
-        thickness = LINE_THICKNESS_ACTIVE
+        image = @dah_thick
       else
         color = Colors::DAH
-        thickness = LINE_THICKNESS
+        image = @dah
       end
-      draw_line(x, y, xx, yy, color, thickness, true)
+      draw_line(x, y, xx, yy, color, image)
       draw_tree(node[:dah], level + 1, xx, yy)
     end
     if node[:dit]
@@ -178,12 +190,12 @@ class Tree
       yy = y + LEVEL_DISTANCE
       if node[:dit][:active]
         color = Colors::DIT_ACTIVE
-        thickness = LINE_THICKNESS_ACTIVE
+        image = @dit_thick
       else
         color = Colors::DIT
-        thickness = LINE_THICKNESS
+        image = @dit
       end
-      draw_line(x, y, xx, yy, color, thickness)
+      draw_line(x, y, xx, yy, color, image)
       draw_tree(node[:dit], level + 1, xx, yy)
     end
     draw_node(x, y, node[:symbol] || "", node[:active])
