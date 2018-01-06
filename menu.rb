@@ -49,11 +49,11 @@ class Menu
       "100 CpM [▼/▲]",
       CHECKBOX_CHAR + " auto [F2]",
       "2000 px/s [F2/F2]",
-      "1000 Hz = a'' [F2/F2]",
+      "1000 Hz [F2/F2]",
       "Iambic B [F2]",
       "Fullscreen [F11]",
       "Clear [ESC]",
-      "Resume [F12]"
+      "Pause [F12]"
     ]
     @widths = items.map do |item|
       @menu_font.text_width(item)
@@ -62,7 +62,6 @@ class Menu
 
   def draw
     frequency_text = (FREQUENCIES[@frequency_index][:f] / 1000.0).round
-    frequency_text = "#{frequency_text} Hz = #{FREQUENCIES[@frequency_index][:name]}"
     iambic_text = "Iambic "
     if @morse.iambic_mode_b
       iambic_text += "B"
@@ -80,7 +79,7 @@ class Menu
       swap_left_right_text = "•/−"
     end
     if @morse.pause
-      pause_text = "Resume"
+      pause_text = "Cont."
     else
       pause_text = "Pause"
     end
@@ -91,7 +90,7 @@ class Menu
       "#{@morse.cpm} CpM [▼/▲]",
       "#{auto_cpm_text} auto [F8]",
       "#{@morse.speed} px/s [F2/F3]",
-      "#{frequency_text} [F4/F5]",
+      "#{frequency_text} Hz [F4/F5]",
       "#{iambic_text} [F6]",
       "Fullscreen [F11]",
       "Clear [ESC]",
