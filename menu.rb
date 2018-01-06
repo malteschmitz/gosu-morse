@@ -52,7 +52,8 @@ class Menu
       "1000 Hz = a'' [F2/F2]",
       "Iambic B [F2]",
       "Fullscreen [F11]",
-      "Clear [ESC]"
+      "Clear [ESC]",
+      "Resume [F12]"
     ]
     @widths = items.map do |item|
       @menu_font.text_width(item)
@@ -78,6 +79,11 @@ class Menu
     else
       swap_left_right_text = "•/−"
     end
+    if @morse.pause
+      pause_text = "Resume"
+    else
+      pause_text = "Pause"
+    end
     items = [
       "#{Gosu.fps} FPS",
       "Key [RET]",
@@ -88,7 +94,8 @@ class Menu
       "#{frequency_text} [F4/F5]",
       "#{iambic_text} [F6]",
       "Fullscreen [F11]",
-      "Clear [ESC]"
+      "Clear [ESC]",
+      "#{pause_text} [F12]"
     ]
     x = (Morse::WIDTH - @widths.sum - (items.size - 1) * MENU_ITEM_SPACE) / 2.0
     y = Morse::HEIGHT - 30
@@ -162,6 +169,9 @@ class Menu
     end
     keyboard_action(Gosu::KB_F11) do
       @morse.fullscreen = !@morse.fullscreen?
+    end
+    keyboard_action(Gosu::KB_F12) do
+      @morse.pause = !@morse.pause
     end
   end
 end

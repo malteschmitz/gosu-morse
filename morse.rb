@@ -17,6 +17,7 @@ class Morse < Gosu::Window
   attr_accessor :frequency
   attr_accessor :iambic_mode_b
   attr_accessor :swap_left_right
+  attr_reader :pause
   attr_reader :now
 
   def initialize
@@ -80,19 +81,27 @@ class Morse < Gosu::Window
 
   def update
     @now = Gosu::milliseconds()
-    @serial.read
-    @menu.read_keyboard
-    
-    stop_tone if @stop_tone_at and @now > @stop_tone_at
-    keyer_next if @now > @next_at
-    
-    decode_pause(@now - @last_tone_event) if !@sending and @last_tone_event
-
     delta = @now - @last_time
     @last_time = @now
-    move_history(@history, delta, @sending)
-    move_history(@history_dit, delta, @dit_down)
-    move_history(@history_dah, delta, @dah_down)
+
+    @menu.read_keyboard
+
+    if @pause
+      @stop_tone_at += delta if @stop_tone_at
+      @next_at += delta if @next_at
+      @last_tone_event += delta if @last_tone_event
+    else
+      @serial.read
+      
+      stop_tone if @stop_tone_at and @now > @stop_tone_at
+      keyer_next if @now > @next_at
+      
+      decode_pause(@now - @last_tone_event) if !@sending and @last_tone_event
+  
+      move_history(@history, delta, @sending)
+      move_history(@history_dit, delta, @dit_down)
+      move_history(@history_dah, delta, @dah_down)
+    end
   end
 
   def draw_history(history, y, height)
@@ -237,12 +246,7 @@ class Morse < Gosu::Window
   end
 
   def start_tone
-    unless @channel and @channel.playing?
-      volume = 1
-      speed = @frequency * 1.0 / SAMPLE_FREQUENCY
-      looping = true
-      @channel = @sample.play(volume, speed, looping)
-    end
+    beep_on
     @sending = true
     if @decoded
       @decoded = nil
@@ -255,10 +259,23 @@ class Morse < Gosu::Window
 
   def stop_tone
     decode_tone(@now - @last_tone_event) if @last_tone_event
-    @channel.stop if @channel and @channel.playing?
+    beep_off
     @sending = false
     @stop_tone_at = nil
     @last_tone_event = @now
+  end
+
+  def beep_on
+    unless @channel and @channel.playing?
+      volume = 1
+      speed = @frequency * 1.0 / SAMPLE_FREQUENCY
+      looping = true
+      @channel = @sample.play(volume, speed, looping)
+    end
+  end
+
+  def beep_off
+    @channel.stop if @channel and @channel.playing?
   end
 
   def decode_tone(length)
@@ -374,6 +391,15 @@ class Morse < Gosu::Window
 
   def needs_cursor?
     not fullscreen?
+  end
+
+  def pause=(val)
+    @pause = val
+    if @pause
+      beep_off
+    else
+      beep_on if @sending
+    end
   end
 end
 
