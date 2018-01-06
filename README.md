@@ -24,7 +24,6 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 
 ## ToDo
 
-* Draw cursor as rectangle instead of using an unicode symbol which is not available on windows
 * Include external font for menu to ensure cross platform consistency
 
 ## Further Ideas

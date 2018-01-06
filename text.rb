@@ -6,7 +6,6 @@ class Text
   POSITION = 10
   LINE_WIDTH = 60
   NUMBER_LINES = 5
-  CURSOR_CHAR = "⎸"
   CURSOR_BLINK_RATE = 600
 
   attr_reader :highlighting
@@ -69,8 +68,9 @@ class Text
       highlight_chars = 0
     end
     @image_cursor = Gosu.record(Morse::WIDTH, 500) do
-      cursor = " " * last.size + CURSOR_CHAR
-      @font.draw(cursor, 0, y_last, 0, 1.0, 1.0, Colors::CURSOR)
+      cursor = " " * last.size
+      xx = @font.text_width(cursor)
+      @morse.draw_rect(xx, y_last + FONT_HEIGHT * 0.2, 2, FONT_HEIGHT * 0.8, Colors::CURSOR)
     end
     @image_text = Gosu.record(Morse::WIDTH, 500) do
       @lines.each_with_index do |line, index|
