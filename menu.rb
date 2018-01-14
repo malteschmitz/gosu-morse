@@ -85,7 +85,8 @@ class Menu
       {text: "Clear [ESC]"},
       {text: "Pause [F12]", active: @morse.pause}
     ]
-    x = (Morse::WIDTH - @widths.sum - (items.size - 1) * MENU_ITEM_SPACE) / 2.0
+    width = @widths.reduce(:+)
+    x = (Morse::WIDTH - width - (items.size - 1) * MENU_ITEM_SPACE) / 2.0
     y = Morse::HEIGHT - 30
     items.each_with_index do |item, i|
       text = item[:text]
