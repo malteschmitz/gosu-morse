@@ -4,6 +4,16 @@ Visual [morse code](https://en.wikipedia.org/wiki/Morse_code) decoder (not only)
 
 This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](https://www.libgosu.org/) for Ruby.
 
+## Features
+
+![Screenshot](gosu-morse.png)
+
+* Decode morse code given either with keys on the keyboard or via an actual morse key attached at the serial port.
+* Encode text entered via keyboard.
+* Supports straight and iambic keyers (mode A and B).
+* Visualize pressed keys and generated sound for iambic keyers.
+* Morse code tree displaying the decoding process live.
+
 ## Installation
 
 1. Install [Ruby](https://www.ruby-lang.org)
@@ -21,6 +31,14 @@ This a rewrite of [morse](https://github.com/malteschmitz/morse) using [Gosu](ht
 1. Install required Ruby gems using bundler
 
         bundle install
+
+## Usage
+
+Start with
+
+        bundle exec ruby morse.rb
+
+Use the enter key to simulate a straight morse keyer. Use the left and right arrows to simulate a iambic keyer. Use the function keys to adjust the settings as indicated in the menu on the bottom.
 
 ## Further Ideas
 
