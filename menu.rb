@@ -44,7 +44,7 @@ class Menu
     items = [
       "60 FPS",
       "Key [RET]",
-      "·/− [F7]",
+      "•/- [F7]",
       "100 CpM [▼/▲]",
       "auto [F2]",
       "2000 px/s [F2/F2]",
@@ -68,9 +68,9 @@ class Menu
       iambic_text += "A"
     end
     if @morse.swap_left_right
-      swap_left_right_text = "−/•"
+      swap_left_right_text = "-/•"
     else
-      swap_left_right_text = "•/−"
+      swap_left_right_text = "•/-"
     end
     items = [
       {text: "#{Gosu.fps} FPS"},
