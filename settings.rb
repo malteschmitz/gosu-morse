@@ -3,5 +3,5 @@ module Settings
   USE_GPIO = true
   PIN_MORSE_KEY = 23
   PIN_LEFT_PADDLE = 24
-  PIN_RIGHT_PADDE = 25
+  PIN_RIGHT_PADDLE = 25
 end

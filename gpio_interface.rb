@@ -7,7 +7,7 @@ class GpioInterface
     RPi::GPIO.set_numbering :bcm
     RPi::GPIO.setup Settings::PIN_MORSE_KEY, :as => :input, :pull => :up
     RPi::GPIO.setup Settings::PIN_LEFT_PADDLE, :as => :input, :pull => :up
-    RPi::GPIO.setup Settings::PIN_RIGHT_PADDE, :as => :input, :pull => :up
+    RPi::GPIO.setup Settings::PIN_RIGHT_PADDLE, :as => :input, :pull => :up
     
     @pin_morse = true
     @pin_left = true
