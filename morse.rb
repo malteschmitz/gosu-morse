@@ -2,8 +2,8 @@ require 'gosu'
 require_relative 'menu'
 require_relative 'tree'
 require_relative 'colors'
-require_relative 'serial_interface'
 require_relative 'text'
+require 'rpi_gpio'
 
 class Morse < Gosu::Window
   SAMPLE_FREQUENCY = 440
@@ -42,8 +42,14 @@ class Morse < Gosu::Window
     
     @menu = Menu.new(self)
     @tree = Tree.new(self)
-    @serial = SerialInterface.new(self)
     @text = Text.new(self)
+    
+    RPi::GPIO.set_numbering :bcm
+    RPi::GPIO.setup 23, :as => :input, :pull => :up
+    RPi::GPIO.setup 24, :as => :input, :pull => :up
+    RPi::GPIO.setup 25, :as => :input, :pull => :up
+    
+    @pin25 = true
   end
 
   def dit_length # in ms
@@ -91,8 +97,8 @@ class Morse < Gosu::Window
       @next_at += delta if @next_at
       @last_tone_event += delta if @last_tone_event
     else
-      @serial.read
-      
+      gpio_read
+    
       stop_tone if @stop_tone_at and @now > @stop_tone_at
       keyer_next if @now > @next_at
       
@@ -102,6 +108,16 @@ class Morse < Gosu::Window
       move_history(@history_dit, delta, @dit_down)
       move_history(@history_dah, delta, @dah_down)
     end
+  end
+  
+  def gpio_read
+    new25 = RPi::GPIO.high? 25
+    if @pin25 and not new25
+      morse_key_down
+    elsif not @pin25 and new25
+      morse_key_up
+    end
+    @pin25 = new25
   end
 
   def draw_history(history, y, height)
@@ -135,7 +151,7 @@ class Morse < Gosu::Window
       when Gosu::KB_ESCAPE
         full_reset
       when Gosu::KB_RETURN
-        start_tone unless @now <= @next_at
+        morse_key_down
       when Gosu::KB_LEFT
         left_down
       when Gosu::KB_RIGHT
@@ -147,12 +163,20 @@ class Morse < Gosu::Window
   def button_up(id)
     case id
     when Gosu::KB_RETURN
-      stop_tone unless @now <= @next_at
+      morse_key_up
     when Gosu::KB_LEFT
       left_up
     when Gosu::KB_RIGHT
       right_up
     end
+  end
+  
+  def morse_key_up
+    stop_tone unless @now <= @next_at
+  end
+  
+  def morse_key_down
+    start_tone unless @now <= @next_at
   end
   
   def dit_up
