@@ -23,7 +23,7 @@ class Morse < Gosu::Window
   attr_reader :now
 
   def initialize
-    super WIDTH, HEIGHT #, true
+    super WIDTH, HEIGHT, Settings::FULLSCREEN
     self.caption = "Morse Code Visualizer"
     @sample = Gosu::Sample.new("440.wav")
     @history = []
