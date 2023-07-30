@@ -134,7 +134,7 @@ class Tree
     xx = x - offset
     yy = y - offset
     circle.draw xx, yy, 0, 1.0/CIRCLE_OVERSCALE, 1.0/CIRCLE_OVERSCALE, color
-    @font.draw_rel(text, x, y, 0, 0.5, 0.5, 1.0, 1.0, color)
+    @font.draw_text_rel(text, x, y, 0, 0.5, 0.5, 1.0, 1.0, color)
   end
 
   def draw_line(x1, y1, x2, y2, color, image)

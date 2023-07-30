@@ -77,18 +77,18 @@ class Text
         y = index * LINE_HEIGHT
         color = Colors::darken(Colors::WHITE, (NUMBER_LINES - 1 - index) * 0.0625 + 0.25)
         line = line[0..-highlight_chars-1] if index == NUMBER_LINES - 1
-        @font.draw(line, 0, y, 0, 1.0, 1.0, color)
+        @font.draw_text(line, 0, y, 0, 1.0, 1.0, color)
       end
     end
     @image_highlight = Gosu.record(Morse::WIDTH, 500) do
       if highlight_chars > 0
         highlight = " " * (last.size - highlight_chars) + last[-highlight_chars..-1]
-        @font.draw(highlight, 0, y_last, 0, 1.0, 1.0, Colors::TEXT_HIGHLIGHT)
+        @font.draw_text(highlight, 0, y_last, 0, 1.0, 1.0, Colors::TEXT_HIGHLIGHT)
       end
     end
     @image_preview = Gosu.record(Morse::WIDTH, 500) do
       preview = " " * last.size + @preview
-      @font.draw(preview, 0, y_last, 0, 1.0, 1.0, Colors::TEXT_PREVIEW)
+      @font.draw_text(preview, 0, y_last, 0, 1.0, 1.0, Colors::TEXT_PREVIEW)
     end
   end
 

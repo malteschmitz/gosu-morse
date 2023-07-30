@@ -96,7 +96,7 @@ class Menu
       else
         color = Colors::MENU
       end
-      @menu_font.draw(text, xx, y, 0, 1.0, 1.0, color)
+      @menu_font.draw_text(text, xx, y, 0, 1.0, 1.0, color)
       x += @widths[i] + MENU_ITEM_SPACE
     end
   end
